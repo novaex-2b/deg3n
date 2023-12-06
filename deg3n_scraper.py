@@ -25,13 +25,18 @@ class deg3n_scraper():
         self._page = page
 
     async def _visit(self,url: str):
-        await self._page.goto(url)
-        twimg = self._page.get_by_test_id("tweetPhoto").first
-        child = twimg.locator('xpath=child::*').first
+        try:
+            await self._page.goto(url)
+            twimg = self._page.get_by_test_id("tweetPhoto").first
+            child = twimg.locator('xpath=child::*').first
+        except PlaywrightTimeoutError:
+            return None
         return (await child.get_attribute("style"))
 
     async def twimg_parse(self,url: str):
         data = await self._visit(url)
+        if data is None:
+            return "Sowwy, I'm being a wittle bwat and can't woad the page UwU"
         url_parse = data.split('"')[1].split("&name")[0]
         return url_parse
 
