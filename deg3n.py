@@ -1,37 +1,38 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import os
+import os,re
 from dotenv import load_dotenv
-import grabber
-import deg3n_scraper
+from twscrape import API
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix="#",intents=discord.Intents.all())
-scraper = deg3n_scraper.deg3n_scraper()
+api = None
 
 @bot.event
 async def on_ready():
     print(f"User: {bot.user} (ID: {bot.user.id})")
-    if scraper is not None:
-        await scraper.browser_setup()
-        await scraper.page_setup()
-        print("scraper is ready for use...")
+    api = API()
+    await api.pool.login_all()
 
 @bot.event
 async def on_message(message):
     await bot.process_commands(message)
     if message.author.id == bot.user.id:
         return
-    if any(link in message.content for link in ["/twitter.com/","/x.com/"]):
-        embed_url = await scraper.twimg_parse(message.content)
-        await message.reply(embed_url,mention_author=False)
 
 @bot.command()
 async def sync(ctx):
     await bot.tree.sync()
     await ctx.send('Command tree synced!')
+
+@bot.tree.command(name="deg3n",guild=1177961540377395292)
+async def deg3n(interaction: discord.Interaction, url: str):
+    tweetid = int(re.search("[\d]+$",url).group())
+    tweet_info = await api.tweet_details(tweetid)
+    twimg_url = details.media.photos[0].url
+    await interaction.response.send_message(content=twimg_url,allowed_mentions=None)
 
 bot.run(TOKEN)

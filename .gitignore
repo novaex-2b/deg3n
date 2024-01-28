@@ -2,3 +2,5 @@ data
 .env
 .bot-env/
 __pycache__/
+accounts.db
+
