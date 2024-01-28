@@ -28,7 +28,7 @@ async def sync(ctx):
     await bot.tree.sync()
     await ctx.send('Command tree synced!')
 
-@bot.tree.command(name="deg3n",guild=1177961540377395292)
+@bot.tree.command(name="deg3n",guild=discord.Object(id=1177961540377395292,type=discord.Guild))
 async def deg3n(interaction: discord.Interaction, url: str):
     tweetid = int(re.search("[\d]+$",url).group())
     tweet_info = await api.tweet_details(tweetid)
